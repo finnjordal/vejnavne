@@ -1,0 +1,19 @@
+{
+  "name": "vejnavne",
+  "version": "1.0.0",
+  "description": "Søgning på vejnavne",
+  "main": "vejnavne.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Finn Jordal",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.8.1",
+    "request": "^2.61.0"
+  },
+  "preferGlobal": "true",
+  "bin": {
+      "vejnavne": "vejnavne.js"
+  }
+}
