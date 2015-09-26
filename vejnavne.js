@@ -1,17 +1,28 @@
 #! /usr/bin/env node
 
-var program = require('commander');
+var program = require('commander')
+	,request = require('request');
  
 program
   .version('0.0.1')
-  .option('-p, --peppers', 'Add peppers')
-  .option('-P, --pineapple', 'Add pineapple')
-  .option('-b, --bbq-sauce', 'Add bbq sauce')
-  .option('-c, --cheese [type]', 'Add the specified type of cheese [marble]', 'marble')
+  .usage('[options] <vejnavn>')
+  .option('-f, --fuzzy', 'Fuzzy søgning')
   .parse(process.argv);
- 
-console.log('you ordered a pizza with:');
-if (program.peppers) console.log('  - peppers');
-if (program.pineapple) console.log('  - pineapple');
-if (program.bbqSauce) console.log('  - bbq');
-console.log('  - %s cheese', program.cheese);
+
+if (!program.args[0]) {
+   program.outputHelp();
+   process.exit(1);
+ }
+
+var options= {};
+options.uri= 'http://dawa.aws.dk/vejnavne';
+options.qs= {q: program.args[0], fuzzy: program.fuzzy};
+
+request(options, function (error, response, body) {
+  if (!error && response.statusCode == 200) {
+  	var vejnavne= JSON.parse(body);
+  	for (var i = 0; i < vejnavne.length; i++) {
+  		console.log(vejnavne[i].navn);
+  	};
+  }
+});
