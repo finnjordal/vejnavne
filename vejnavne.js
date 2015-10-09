@@ -14,15 +14,38 @@ if (!program.args[0]) {
    process.exit(1);
  }
 
-var options= {};
-options.uri= 'http://dawa.aws.dk/vejnavne';
-options.qs= {q: program.args[0], fuzzy: program.fuzzy};
+var pvejnavne = new Promise(function(resolve, reject) {
+	var options= {};
+	options.uri= 'http://dawa.aws.dk/vejnavne';
+	options.qs= {q: program.args[0], fuzzy: program.fuzzy, per_side: 20};
 
-request(options, function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-  	var vejnavne= JSON.parse(body);
-  	for (var i = 0; i < vejnavne.length; i++) {
-  		console.log(vejnavne[i].navn);
-  	};
-  }
+	request(options, function (error, response, body) {
+		if (error) {
+			reject(error);
+			return;
+		}
+		if (response.statusCode !== 200) {
+			reject(response.statusCode);
+			return;
+		}
+		try {			
+	  	var vejnavne= JSON.parse(body);
+	  	resolve(vejnavne);
+		}
+		catch(e) {
+			reject(e.message);
+		}
+	});
 });
+
+pvejnavne
+	.then(
+		function(vejnavne) {
+			for (var i = 0; i < vejnavne.length; i++) {
+	  		console.log(vejnavne[i].navn);
+	  	};
+		})
+	.catch(
+		function(error) {
+			console.log('Fejl: '+error)
+		});
